@@ -15,8 +15,8 @@ var MESSAGE_SCHEMA = {
       properties: {
         digital : {
           type: "string",
-          title: "digital pin (WiringPi pin, not physical pin)",
-          enum: ["0", "2", "3", "7", "8", "9"],
+          title: "digital pin",
+          enum: ["11", "13", "15", "7", "3", "5"],
           required: false
         },
         servo: {
@@ -149,6 +149,16 @@ conn.on('ready', function(data) {
     var servo = new five.Servo(1);
     var servo2 = new five.Servo(24);
 
+
+
+
+    this.pinMode(12, five.Pin.INPUT);
+    this.pinMode(13, five.Pin.INPUT);
+    this.pinMode(14, five.Pin.INPUT);
+    this.pinMode(4, five.Pin.INPUT);
+    this.pinMode(5, five.Pin.INPUT);
+    this.pinMode(21, five.Pin.INPUT);
+
     // Handles incoming Octoblu messages
     conn.on('message', function(data) {
      console.log('message received');
@@ -168,21 +178,21 @@ conn.on('ready', function(data) {
     //checks the pin number from 'enum' in peripheral.digital, then sends it high or low
     if(payload.digitalWrite.enable){
       switch(payload.peripheral.digital){
-        case "0":
+        case "11":
           if(payload.digitalWrite.state == "high"){
             p0.on();
           }else{
             p0.off();
           }
           break;
-        case "2":
+        case "13":
           if(payload.digitalWrite.state == "high"){
             p2.on();
           }else{
             p2.off();
           }
           break;
-        case "3":
+        case "15":
           if(payload.digitalWrite.state == "high"){
             p3.on();
           }else{
@@ -196,14 +206,14 @@ conn.on('ready', function(data) {
             p7.off();
           }
           break;
-        case "8":
+        case "3":
           if(payload.digitalWrite.state == "high"){
             p8.on();
           }else{
             p8.off();
           }
           break;
-        case "9":
+        case "5":
           if(payload.digitalWrite.state == "high"){
             p9.on();
           }else{
@@ -238,5 +248,56 @@ conn.on('ready', function(data) {
       }
     }
   }); // end Meshblu connection onMessage
+
+// begin sensor stuff
+
+
+
+ var v0, v1, v2, v3, v4, v5;
+  this.digitalRead(12, function(value) {
+    v0 = value;
+  });
+
+  this.digitalRead(13, function(value) {
+    v1 = value;
+  });
+
+  this.digitalRead(14, function(value) {
+    v2 = value;
+  });
+
+  this.digitalRead(4, function(value) {
+    v3 = value;
+  });
+
+  this.digitalRead(5, function(value) {
+    v4 = value;
+  });
+  this.digitalRead(21, function(value) {
+    v5 = value;
+  });
+
+
+
+ setInterval(function(){
+
+
+
+    conn.message({
+      "devices": "*",
+      "payload": {
+        digitalread : {
+        "p19": v0,
+        "p21": v1,
+        "p23": v2,
+        "p16": v3,
+        "p18": v4,
+        "p29": v5 }
+      }
+    });
+
+  },400);
+
+//end sensor stuff
  }); // end johnny-five board onReady
 }); // end Meshblu connection onReady
